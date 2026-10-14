@@ -1,0 +1,13 @@
+import test,{before,after} from 'node:test';
+import assert from 'node:assert/strict';
+import {server,adapters} from '../server.mjs';
+import {examplePlan} from '../planner.mjs';
+let base;
+before(async()=>{process.env.OPENAI_API_KEY='test-only-secret';process.env.AI_MODEL='mock-model';process.env.AI_PROVIDER='openai';process.env.AI_TIMEOUT_MS='1000';await new Promise(r=>server.listen(0,'127.0.0.1',r));base=`http://127.0.0.1:${server.address().port}`;});
+after(async()=>{delete process.env.OPENAI_API_KEY;delete process.env.AI_MODEL;delete process.env.AI_PROVIDER;delete process.env.AI_TIMEOUT_MS;await new Promise(r=>server.close(r));});
+const payload=JSON.stringify({mode:'ai',input:{idea:'군중 속 캐릭터 찾기'}});
+const request=signal=>fetch(base+'/api/generate',{method:'POST',signal,headers:{'Content-Type':'application/json'},body:payload});
+test('AI 성공 파이프라인 모의: 검증 및 원문 포함, 키 노출 없음',async()=>{adapters.openai=async data=>examplePlan(data);const response=await request();assert.equal(response.status,200);const r=await response.json();assert.equal(r.mode,'ai');assert.equal(r.sections.length,12);assert.ok(r.prompt.includes(r.sections[7].content));assert.equal(JSON.stringify(r).includes('test-only-secret'),false);const status=await(await fetch(base+'/api/status')).json();assert.equal(status.aiConnected,true);assert.equal(status.connectionVerified,false);assert.equal(JSON.stringify(status).includes('test-only-secret'),false);});
+test('교체된 어댑터의 잘못된 기획도 서버가 거부한다',async()=>{adapters.openai=async()=>({title:'누락',sections:[],questions:[]});const response=await request();assert.equal(response.status,400);assert.match((await response.json()).error,/11개 기획/);});
+test('실제 HTTP 타임아웃은 제공자 작업을 중단하고 504 반환',async()=>{let aborted=false;adapters.openai=async(_,signal)=>new Promise((resolve,reject)=>{signal.addEventListener('abort',()=>{aborted=true;reject(new DOMException('Stopped','AbortError'));},{once:true});});const response=await request();assert.equal(response.status,504);assert.match((await response.json()).error,/시간이 초과/);assert.equal(aborted,true);});
+test('실제 HTTP 클라이언트 취소는 제공자 signal로 전파된다',async()=>{let started;const start=new Promise(r=>started=r);let ended;const end=new Promise(r=>ended=r);adapters.openai=async(_,signal)=>new Promise((resolve,reject)=>{signal.addEventListener('abort',()=>{ended();reject(new DOMException('Stopped','AbortError'));},{once:true});started();});const abort=new AbortController();const response=request(abort.signal);const rejected=assert.rejects(response,{name:'AbortError'});await start;abort.abort();await rejected;await Promise.race([end,new Promise((_,reject)=>setTimeout(()=>reject(new Error('Provider was not cancelled')),2000))]);});
