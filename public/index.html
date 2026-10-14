@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#132624"><title>로블록스 게임 최적화 제작기</title><link rel="icon" href="./favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="./style.css"><script type="module" src="./app.js"></script></head>
+<body>
+<header><a class="brand" href="./" aria-label="제작기 홈"><span class="brandmark">◈</span><span>PLAY<span class="brand-light">CRAFT</span><small>로블록스 게임 최적화 제작기</small></span></a><div class="header-right"><span class="workspace-label">아이디어를 플레이로</span><span id="connection" class="status"><i></i>연결 확인 중</span></div></header>
+<main>
+<section class="hero"><div><div class="eyebrow"><span></span> YOUR NEXT GAME STARTS HERE</div><h1>머릿속 아이디어를,<br><span>플레이 가능한 설계로.</span></h1><p>작은 아이디어 하나면 충분해요.<br>게임의 재미부터 제작 순서까지, 빠짐없이 준비해 보세요.</p></div><div class="hero-art" aria-hidden="true"><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="block block-a"><span>✦</span></div><div class="block block-b"></div><div class="block block-c"></div><span class="art-label art-label-a">IDEA</span><span class="art-label art-label-b">BUILD → PLAY</span><div class="art-dot"></div></div></section>
+<div class="steps" aria-label="제작 흐름"><span class="active"><b>01</b> 아이디어 입력</span><span class="step-line"></span><span><b>02</b> 기획 준비</span><span class="step-line"></span><span><b>03</b> 제작 프롬프트</span></div>
+<div class="workspace">
+<section class="input-card card"><div class="card-heading"><div><span class="mini-label">THE STARTING POINT</span><h2>어떤 게임을 만들고 싶으세요?</h2></div><span class="number-tag">01</span></div><p class="muted intro">하고 싶은 행동이나 떠오른 장면을 자유롭게 적어 주세요.</p>
+<form id="idea-form" novalidate><label for="idea">게임 아이디어 <span class="required">필수</span></label><div class="idea-wrap"><textarea id="idea" name="idea" maxlength="4000" placeholder="예: 친구와 함께 보물을 옮기고, 무너지는 섬에서 탈출하는 게임을 만들고 싶어요." required></textarea><span id="counter">0 / 4,000</span></div>
+<div class="example-label">막막하다면, 여기서 시작해 보세요 <span>↙</span></div><div class="example-chips"><button type="button" data-example="search">⌕ 군중 속 캐릭터 찾기</button><button type="button" data-example="coop">◇ 친구와 보물 운반하기</button><button type="button" data-example="shop">▤ 나만의 작은 가게</button></div>
+<details id="settings"><summary><span>⚙ 선택 설정 <small>더 구체적인 결과를 원한다면</small></span><span class="expand">+</span></summary><div class="settings-grid">
+<label>장르<select name="genre"><option>자동 판단</option><option>탐색</option><option>협동 어드벤처</option><option>경영</option><option>기타</option></select></label>
+<label>제작 인원·개발 경험<input name="team" maxlength="500" value="1~2명 · 입문"></label>
+<label>목표 유저<input name="audience" maxlength="500" value="친구와 가볍게 즐기는 유저"></label>
+<label>지원 기기<select name="devices"><option>모바일·PC</option><option>모바일</option><option>PC</option><option>모바일·PC·콘솔</option></select></label>
+<label>예산<input name="budget" maxlength="500" placeholder="미정"></label><label>일정<input name="schedule" maxlength="500" placeholder="미정"></label>
+<label>분위기·그림체<input name="style" maxlength="500" placeholder="밝고 간결한 오리지널 스타일"></label><label>참고 게임<input name="references" maxlength="500" placeholder="없음"></label>
+<label class="wide">보유 모델·음악·이미지<input name="assets" maxlength="500" placeholder="없음 · 기본 Part와 임시 UI 사용"></label>
+<label>과금<select name="monetization"><option>핵심 재미 검증 후 검토</option><option>과금 미사용</option><option>외형 구매 포함</option></select></label>
+<label>기획 범위<select name="scope"><option>작은 초기 출시</option><option>완결 시험판</option><option>출시·운영까지 상세 설계</option></select></label>
+</div></details>
+<div class="assumptions"><span>ⓘ</span><p>기본은 <strong>소규모 제작 · 모바일과 PC · 작은 초기 출시</strong>예요.<br>과금은 핵심 재미를 확인한 뒤 검토합니다. 설정에서 바꿀 수 있어요.</p></div>
+<button class="primary generate" id="prompt-button" type="submit"><span>제작 프롬프트 만들기</span><span>↗</span></button>
+<div class="secondary-actions"><button type="button" id="ai-button">✦ AI 상세 기획 생성</button><button type="button" id="example-button">예시 기획 보기 →</button></div>
+<p id="ai-note" class="fineprint">AI 연결을 확인하고 있습니다.</p>
+</form>
+<div id="progress" class="progress" hidden role="status"><span class="spinner"></span><span id="progress-text">요청을 처리하고 있어요.</span><button id="cancel-button" type="button">취소</button></div>
+<div id="error" class="error" hidden role="alert"><p id="error-text"></p><button type="button" id="retry-button">다시 시도</button></div>
+</section>
+<aside class="sidebar"><section class="guide-card card"><span class="mini-label">FROM IDEA TO BLUEPRINT</span><h2>좋은 게임은,<br>좋은 질문에서 시작해요.</h2><div class="guide-row"><span class="guide-icon">⌕</span><div><h3>핵심 재미를 먼저</h3><p>유저가 반복하고 싶은 행동을 찾고<br>첫 5분의 경험을 설계해요.</p></div></div><div class="guide-row"><span class="guide-icon">▦</span><div><h3>빠짐없는 12개 항목</h3><p>시스템, 모바일, 저장과 보안까지.<br>기획의 빈틈을 줄여요.</p></div></div><div class="guide-row"><span class="guide-icon">↗</span><div><h3>하나의 제작 프롬프트</h3><p>Claude · GPT · Codex에 전달할<br>독립적인 제작 지시서를 준비해요.</p></div></div><div class="guide-footer">작게 시작하고, 실제 플레이로 검증하세요. <span>✦</span></div></section>
+<section class="history-card card"><div class="history-heading"><h2>최근 결과</h2><span id="history-count">0</span></div><div id="history-list"></div><p class="storage-note">이 브라우저에 최대 10개 보관됩니다.<br>다른 기기와 공유되지 않으며, 브라우저 데이터 삭제 시 사라집니다.</p></section></aside>
+</div>
+<section id="result" class="result-card card" hidden aria-label="생성 결과"><div class="result-heading"><div><span id="result-mode" class="mode-tag"></span><h2 id="result-title"></h2><p id="result-date" class="muted"></p></div><button type="button" id="new-button" class="text-button">↑ 아이디어 수정</button></div><div id="result-notice" class="result-notice"></div><div class="result-toolbar"><div class="tabs" role="tablist"><button id="tab-prompt" role="tab" aria-selected="true" aria-controls="prompt-panel">통합 제작 프롬프트</button><button id="tab-plan" role="tab" aria-selected="false" aria-controls="plan-panel">상세 기획 · 12항목</button></div><div class="export-actions"><button id="copy-button" type="button">▣ 전체 복사</button><button id="download-md" type="button">↓ .md</button><button id="download-txt" type="button">↓ .txt</button></div></div><div id="prompt-panel" role="tabpanel" aria-labelledby="tab-prompt"><div class="prompt-tip">이 프롬프트 하나를 다른 AI에게 전달하세요. 입력과 설정, 제작 순서가 모두 포함되어 있어요.</div><pre id="prompt-content"></pre></div><div id="plan-panel" role="tabpanel" aria-labelledby="tab-plan" hidden><div class="plan-layout"><nav id="toc" aria-label="기획 목차"></nav><div id="plan-content"></div></div><div id="questions"></div></div><div id="copy-fallback" hidden><label for="copy-text">클립보드를 사용할 수 없어요. 아래 내용을 선택해 직접 복사하세요.</label><textarea id="copy-text" readonly></textarea><button id="close-fallback" type="button">닫기</button></div></section>
+<section class="bottom-note"><span>◇</span><p>설계는 더 선명하게, 시작은 더 가볍게.<small>기획 완성과 게임 구현은 다릅니다. 좋은 결과는 실제 플레이 테스트로 확인해야 해요.</small></p></section>
+</main><footer><span>PLAYCRAFT <span class="footer-divider">/</span> 로블록스 게임 최적화 제작기</span><span>독립적인 제작 도구 · Roblox 공식 서비스가 아닙니다.</span></footer><div id="toast" role="status" hidden></div>
+</body></html>
