@@ -1,0 +1,11 @@
+{
+  "appId": "io.github.alwaysnam.playcraft",
+  "appName": "게임 제작 프롬프트 메이커",
+  "webDir": "dist",
+  "android": {
+    "allowMixedContent": false
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}

@@ -117,3 +117,47 @@ npm run test:pages
 GitHub의 Pages 설정 화면에서 비공개 저장소에 ‘Upgrade or make this repository public’이 나타나면 현재 요금제에서는 활성화할 수 없습니다. 무료 공개 저장소로 전환하려면 소유자가 코드와 커밋 이력 공개를 승인해야 합니다. 비공개 유지 시 공식 GitHub 가격/요금제 조건을 확인하고 업그레이드 여부를 결정해야 합니다. 이 프로젝트가 자동으로 저장소 공개나 결제를 변경하지 않습니다.
 
 활성화 후: Settings → Pages → Source ‘GitHub Actions’ 선택 → Actions → ‘Deploy GitHub Pages’ → ‘Run workflow’. 워크플로는 수동 실행으로 제공하며, 병합만으로 공개 배포를 시작하지 않습니다. 성공한 작업의 `github-pages` 환경에서 실제 배포 주소를 확인하세요. 예상 주소 `https://always-nam.github.io/codex_roblox_maker/`는 배포 성공과 HTTP 응답을 확인하기 전까지 검증된 링크가 아닙니다.
+
+## Android 앱 · 게임 제작 프롬프트 메이커
+
+앱은 게임을 만드는 엔진이 아니라 **게임 제작용 프롬프트를 만드는 도구**입니다. 프롬프트를 Claude·GPT·Codex 같은 별도 AI에 전달해 실제 구현을 진행합니다. Android 버전은 앱 내 AI 버튼/호출을 제외하고 오프라인 프롬프트·예시·기기 보관·네이티브 복사·파일 공유를 제공합니다. APK 설치에는 Node.js나 API 키가 필요하지 않습니다.
+
+프로젝트는 Capacitor 8.5.3, Android 최소 API 24/목표 API 36, Java 21 기반입니다. 앱 ID `io.github.alwaysnam.playcraft`, 표시 이름 ‘게임 제작 프롬프트 메이커’, 버전 1.0.0입니다. 로컬 데이터 자동 백업과 인터넷 권한을 제외했으며, 내보낸 파일은 캐시의 exports 디렉터리에서 사용자가 선택한 공유 앱으로 전달합니다.
+
+### 앱 빌드
+
+Android Studio와 SDK/Java가 준비된 PC에서:
+
+```sh
+npm ci
+npm run build:mobile
+npm run android:debug
+npm run android:bundle
+```
+
+`build:mobile`은 기존 dist를 앱 자산으로 준비합니다. 웹 배포 시에는 `build:pages`를 별도로 실행하세요. 출력:
+
+- `android/app/build/outputs/apk/debug/app-debug.apk`: 개발용 서명된 APK, 시험 설치용
+- `android/app/build/outputs/bundle/release/app-release.aab`: 업로드키가 없으면 미서명. **그대로 Play에 제출할 수 없음**
+
+Android 앱 화면/네이티브 브리지 계약 모의 검증: `node tests/mobile-browser.mjs`. 브라우저 검사는 실제 Android WebView/플러그인/휴대폰 검사와 다릅니다.
+
+클라우드에서 마련한 도구 경로는 `/workspace/toolchains`에 있습니다. 환경 스냅샷에 보존될 수 있으나 신규 머신에 반드시 존재한다고 가정하지 마세요. 현재 머신의 명령:
+
+```sh
+cd android
+JAVA_HOME=/workspace/toolchains/jdk21/jdk-21.0.12.1 \
+ANDROID_HOME=/workspace/toolchains/android-sdk \
+ANDROID_USER_HOME=/workspace/toolchains/android-user \
+GRADLE_USER_HOME=/workspace/toolchains/gradle \
+JAVA_TOOL_OPTIONS=-Duser.home=/workspace/toolchains/java-user \
+./gradlew --no-daemon --max-workers=4 assembleDebug bundleRelease lintDebug
+```
+
+JDK와 Android 도구는 공식 배포물의 체크섬을 검증했으며 Gradle wrapper의 공식 SHA256을 고정했습니다. 클라우드에서는 기본 사용자 홈이 읽기 전용이므로 위 경로를 사용합니다. JDK에 플랫폼의 신뢰된 CA 인증서를 가져와 TLS 검증을 유지하고 기존 프록시 경로를 사용했습니다. 새 환경에서의 재설치는 해당 공식 도구와 플랫폼 신뢰 설정으로 준비해야 합니다.
+
+### Google Play 등록
+
+[등록 자료와 설명 초안](store/GOOGLE_PLAY.md)에 비용·계정/테스터 요건·업로드·개인정보 안내·검증 목록을 정리했습니다. 문의 이메일은 `akrrnrtn@naver.com`입니다. `store/assets`에는 아이콘·기능 그래픽·웹 기반 화면 미리보기가 있으며 실제 휴대폰 스크린샷으로 최종 교체해야 합니다.
+
+Google Play 제출에는 **남대표님 소유의 업로드키로 서명된 AAB**가 필요합니다. Android Studio → Build → Generate Signed App Bundle or APK → Android App Bundle에서 본인 키를 생성/선택하고 안전하게 백업하세요. 키/암호를 채팅·GitHub에 올리지 마세요. 환경변수 `PLAYCRAFT_KEYSTORE`, `PLAYCRAFT_STORE_PASSWORD`, `PLAYCRAFT_KEY_ALIAS`, `PLAYCRAFT_KEY_PASSWORD`를 안전하게 주입하면 Gradle release 서명 설정이 사용됩니다. 이 작업에서는 본인 업로드키를 만들거나 Play에 제출하지 않았습니다.
