@@ -1,6 +1,6 @@
 const staticMode=document.documentElement.dataset.runtime==='static';
 export async function getStatus(){
- if(staticMode)return {aiConnected:false,staticMode:true,connectionVerified:false};
+ if(staticMode)return {aiConnected:false,staticMode:true,nativeMode:document.documentElement.dataset.native==='true',connectionVerified:false};
  const response=await fetch('/api/status');if(!response.ok)throw new Error('서버 연결 확인 필요');return response.json();
 }
 export async function generateResult(mode,input,signal){

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">게임 제작 프롬프트 메이커</string>
+    <string name="title_activity_main">게임 제작 프롬프트 메이커</string>
+    <string name="package_name">io.github.alwaysnam.playcraft</string>
+    <string name="custom_url_scheme">io.github.alwaysnam.playcraft</string>
+</resources>
